@@ -16,7 +16,6 @@ server.listen(8001, () => {
 io.on('connection', (socket) => {
   console.log('a user connected');
   socket.on('stream', function (data) {
-    console.log(data)
     socket.emit('stream', data);
   });
  
