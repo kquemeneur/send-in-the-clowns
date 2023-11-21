@@ -109,26 +109,17 @@
     }
   }*/
 
-  video.addEventListener('play', function(e) {
+  video.addEventListener('playing', function(e) {
     console.log("ça stream")
-    console.log(socket)
-    socket.emit("tarace","tamere")
-    socket.emit("stream",preview.toDataURL('image/webp'));
-    //socket.emit('chat message', input.value);
-    //input.value = '';
-    
+    socket.emit("stream",preview.toDataURL("image/jpeg", 1.0));
+    console.log(preview.toDataURL("image/jpeg", 1.0))
   });
-  socket.on("tarace",function(msg){
-    var item = document.createElement('div');
-    console.log(msg)
-    item.textContent = msg
-    container.appendChild(item);
 
-  })
   socket.on("stream",function(data){
+    var item = document.createElement('div');
+    container.appendChild(item);
     console.log("ehoh")
-    document.getElementById("play").attr('src',data);
-    document.getElementById("log").text(data);
+    document.getElementById("play").src = data;
   });
   /*socket.on('video', function(video) {
     var item = document.createElement('div');
