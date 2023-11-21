@@ -4,6 +4,7 @@
   "description": "Une application JS qui capte le flux d'une webcam, ajoute un nez rouge à la personne filmée et diffuse la séquence d'images transformées",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
