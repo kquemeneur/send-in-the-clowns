@@ -2,33 +2,37 @@
 <html>
   <head>
     <title>Send in the clowns *pouet pouet*</title>
-    <script src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <!--<script src="https://unpkg.com/ml5@latest/dist/ml5.min.js" type="text/javascript"></script>-->
+    <script src="/socket.io/socket.io.js" type="text/javascript"></script>
   </head>
   <body>
     <h1>Send in the clowns</h1>
     <div id="container">
       <div> 
-        <canvas id="canvas" width="640" height="480"></canvas> 
-        <video id="video" width="640" height="480" autoplay style="display: none"></video>
+        <video src="" id="video" style="width:30%; height: auto;" autoplay="true"></video>
+        <canvas style="display:none;" id="preview"></canvas>
       </div>
       <img id="play">
-        </br>
       <div id="log"></div>
       
     </div>
     
   </body>
 </html>
-
-<script src="/socket.io/socket.io.js"></script>
 <script>
   var socket = io();
 
   var video = document.getElementById("video");
-  var canvas = document.getElementById("canvas");
+  var preview = document.getElementById("preview");
   var container = document.getElementById("container")
+        
+  preview.width = 250;
+  preview.height = 180;
   
-  var ctx = canvas.getContext("2d");
+  var ctx = preview.getContext("2d");
+  ctx.width = preview.width;
+  ctx.height = preview.height;
 
   let poses = [];
 
@@ -46,7 +50,7 @@
   // is not detecting a position
   function drawCameraIntoCanvas() {
     // Draw the video element into the canvas
-    ctx.drawImage(video, 0, 0, 640, 480);
+    ctx.drawImage(video, 0, 0, preview.width, preview.height);
     // We can call both functions to draw all keypoints and the skeletons
     //drawKeypoints();
     //drawSkeleton();
@@ -106,15 +110,22 @@
   }*/
 
   video.addEventListener('play', function(e) {
-    e.preventDefault();
     console.log("ça stream")
-    socket.emit('stream',canvas.toDataURL('image/webp'));
+    console.log(socket)
+    socket.emit("tarace","tamere")
+    socket.emit("stream",preview.toDataURL('image/webp'));
     //socket.emit('chat message', input.value);
     //input.value = '';
     
   });
+  socket.on("tarace",function(msg){
+    var item = document.createElement('div');
+    console.log(msg)
+    item.textContent = msg
+    container.appendChild(item);
 
-  socket.on('stream',function(data){
+  })
+  socket.on("stream",function(data){
     console.log("ehoh")
     document.getElementById("play").attr('src',data);
     document.getElementById("log").text(data);

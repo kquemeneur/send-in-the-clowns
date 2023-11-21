@@ -9,12 +9,16 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
-io.on('connection', (socket) => {
-    socket.on('stream',function(data){
-        socket.broadcast.emit('stream',data);
-    });
+server.listen(8001, () => {
+  console.log('listening on *:8001');
 });
 
-server.listen(5000, () => {
-  console.log('listening on *:5000');
+io.on('connection', (socket) => {
+  console.log('a user connected');
+  socket.on('stream', function (data) {
+    socket.broadcast.emit('stream', data);
+  });
+  socket.on('tarace', function (msg) {
+    socket.broadcast.emit('tarace', msg);
+  });
 });
