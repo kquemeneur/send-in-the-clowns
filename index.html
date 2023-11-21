@@ -116,8 +116,8 @@
 
   socket.on('stream',function(data){
     console.log("ehoh")
-    $('#play').attr('src',data);
-    $('#log').text(data);
+    document.getElementById("play").attr('src',data);
+    document.getElementById("log").text(data);
   });
   /*socket.on('video', function(video) {
     var item = document.createElement('div');
