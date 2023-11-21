@@ -1,0 +1,24 @@
+{
+  "name": "send-in-the-clowns",
+  "version": "1.0.0",
+  "description": "Une application JS qui capte le flux d'une webcam, ajoute un nez rouge à la personne filmée et diffuse la séquence d'images transformées",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/kquemeneur/send-in-the-clowns.git"
+  },
+  "author": "Margaux Argentin & Katell Quéméneur",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kquemeneur/send-in-the-clowns/issues"
+  },
+  "homepage": "https://github.com/kquemeneur/send-in-the-clowns#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "ml5": "^0.12.2",
+    "socket.io": "^4.7.2"
+  }
+}
