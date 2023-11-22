@@ -10,7 +10,7 @@ app.get('/', (req, res) => {
 });
 
 server.listen(8001, () => {
-  console.log('listening on *:8001');
+  console.log('listening on http://localhost:8001');
 });
 
 io.on('connection', (socket) => {
