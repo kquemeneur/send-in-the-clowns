@@ -59,22 +59,20 @@
   </body>
 </html>
 <script>
+  // connexion au serveur
   var socket = io();
 
   var poses = []
 
+  // récupération des élements HTML
   var video = document.getElementById("video");
   var preview = document.getElementById("preview");
   var origin = document.getElementById("origin")
   var originCanvas = document.getElementById("origin-canvas")
   
   var ctx = preview.getContext("2d");
-  console.log(ctx)
 
-  var ctxO = originCanvas.getContext("2d");
-  console.log(ctxO)
-
-  // Create a webcam capture
+  // gestion de la capture webcam
   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
       video.srcObject = stream;
@@ -82,38 +80,37 @@
     });
   }
   
-  // A function to draw the video 
+  // affichage de la vidéo d'origine
   function drawCameraIntoCanvas() {
-    // Draw the video element into the canvas
     ctx.drawImage(video, 0, 0, preview.width, preview.height);
     drawKeypoints();
     window.requestAnimationFrame(drawCameraIntoCanvas);
   }
-  // Loop over the drawCameraIntoCanvas function
+
   drawCameraIntoCanvas();
 
-  // Create a new poseNet method with a single detection
+  // initalisation de poseNet
   const poseNet = ml5.poseNet(video, modelReady);
   poseNet.on("pose", gotPoses);
-  // A function that gets called every time there's an update from the model
+
   function gotPoses(results) {
     poses = results;
   }
+
   function modelReady() {
     console.log("model ready");
     poseNet.multiPose(video);
   }
-  // A function to draw ellipses over the detected keypoints
+  // dessin du nez rouge sur le visage détecté
   function drawKeypoints() {
-    // Loop through all the poses detected
+    // pour chaque pose détectée
     for (let i = 0; i < poses.length; i += 1) {
-      // For each pose detected, loop through all the keypoints
+      // pour chaque keypoint détecté
       for (let j = 0; j < poses[i].pose.keypoints.length; j += 1) {
         let keypoint = poses[i].pose.keypoints[j];
-        // Only draw an ellipse is the pose probability is bigger than 0.2
+        // dessiner le nez rouge sur le keypoint correspondant à la position du nez
         if (keypoint.score > 0.2 && keypoint.part==='nose') {
           ctx.beginPath();
-          //console.log(keypoint)
           ctx.arc(keypoint.position.x, keypoint.position.y, 10, 0, 2 * Math.PI);
           ctx.fillStyle="red";
           ctx.fill();
@@ -124,16 +121,17 @@
     }
   }
 
+  // quand le client reçoit une image, on change la source de l'image qui va recevoir l'ensemble des images traitées
   socket.on("stream",function(data){
     origin.src = data;
   });
 
+  // toute les millisecondes on envoi l'image traitée
   function streamOrigin(){
     setInterval(function(){
-      socket.emit("stream",preview.toDataURL("image/webp", 0.9));
+      socket.emit("stream",preview.toDataURL("image/webp", 0.7)); // qualité d'image de 70%
     },0.1);
   };
   streamOrigin()
-
-
+  
 </script>
