@@ -5,19 +5,57 @@
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <script src="https://unpkg.com/ml5@latest/dist/ml5.min.js" type="text/javascript"></script>
     <script src="/socket.io/socket.io.js" type="text/javascript"></script>
+    <style>
+      html, body{
+       padding:0;
+       margin:0 
+      }
+      body{
+        background-color: rgb(7,6,10);
+        height:100vh;
+        font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      .preview-container{
+        border: rgb(100,10,20) solid 10px;
+      }
+      .origin-container{
+        border: rgb(20,10,100) solid 10px;
+      }
+      p{
+        position: relative;
+        opacity: 0.2;
+        z-index: -1;
+        font-size: 8px;
+        color: red;
+        text-align: justify;
+        transform: rotateZ(15deg);
+      }
+      .bg-container{
+        position:absolute;
+        height:100vh;
+        width:100vw;
+        overflow:hidden;
+      }
+    </style>
   </head>
   <body>
-    <h1>Send in the clowns</h1>
+    <h1>Send in the clowns 🎈🤡</h1>
     <div id="container">
-      <div> 
-        <video src="" id="video" style="width:250px; height: 180px;" autoplay="true"></video>
-        <canvas style="display:none;" id="preview"></canvas>
+      <div class="preview-container"> 
+        <video src="" id="video" width="250" height="180" autoplay="true"></video>
+        <canvas style="display:none;" width="250" height="180" id="preview"></canvas>
       </div>
-      <img id="play">
-      <div id="log"></div>
-      
+      <div class="origin-container">
+        <canvas style="display:none;" width="250" height="180" id="origin-canvas"></canvas>
+        <img id="origin">
+      </div>
+     
     </div>
-    
   </body>
 </html>
 <script>
@@ -27,14 +65,14 @@
 
   var video = document.getElementById("video");
   var preview = document.getElementById("preview");
-  var container = document.getElementById("container")
-        
-  preview.width = 250;
-  preview.height = 180;
+  var origin = document.getElementById("origin")
+  var originCanvas = document.getElementById("origin-canvas")
   
   var ctx = preview.getContext("2d");
-  ctx.width = video.width;
-  ctx.height = video.height;
+  console.log(ctx)
+
+  var ctxO = originCanvas.getContext("2d");
+  console.log(ctxO)
 
   // Create a webcam capture
   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -43,17 +81,12 @@
       video.play();
     });
   }
-
-  function sleep (time) {
-    return new Promise((resolve) => setTimeout(resolve, time));
-  }
   
   // A function to draw the video 
   function drawCameraIntoCanvas() {
     // Draw the video element into the canvas
     ctx.drawImage(video, 0, 0, preview.width, preview.height);
     drawKeypoints();
-    drawSkeleton();
     window.requestAnimationFrame(drawCameraIntoCanvas);
   }
   // Loop over the drawCameraIntoCanvas function
@@ -80,6 +113,7 @@
         // Only draw an ellipse is the pose probability is bigger than 0.2
         if (keypoint.score > 0.2 && keypoint.part==='nose') {
           ctx.beginPath();
+          //console.log(keypoint)
           ctx.arc(keypoint.position.x, keypoint.position.y, 10, 0, 2 * Math.PI);
           ctx.fillStyle="red";
           ctx.fill();
@@ -89,29 +123,14 @@
       }
     }
   }
-  // A function to draw the skeletons
-  function drawSkeleton() {
-    // Loop through all the skeletons detected
-    for (let i = 0; i < poses.length; i += 1) {
-      // For every skeleton, loop through all body connections
-      for (let j = 0; j < poses[i].skeleton.length; j += 1) {
-        let partA = poses[i].skeleton[j][0];
-        let partB = poses[i].skeleton[j][1];
-        ctx.beginPath();
-        ctx.moveTo(partA.position.x, partA.position.y);
-        ctx.lineTo(partB.position.x, partB.position.y);
-        ctx.stroke();
-      }
-    }
-  }
 
   socket.on("stream",function(data){
-    document.getElementById("play").src = data;
+    origin.src = data;
   });
 
   function streamOrigin(){
     setInterval(function(){
-      socket.emit("stream",preview.toDataURL("image/jpeg", 0.1));
+      socket.emit("stream",preview.toDataURL("image/webp", 0.9));
     },0.1);
   };
   streamOrigin()
